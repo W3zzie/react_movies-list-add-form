@@ -1,122 +1,98 @@
-import { FormEvent, useEffect, useState } from 'react';
-import { TextField } from '../TextField';
+import React, { useState } from 'react';
 import { Movie } from '../../types/Movie';
+import { TextField } from '../TextField';
 
 type Props = {
   onAdd: (movie: Movie) => void;
 };
 
 export const NewMovie: React.FC<Props> = ({ onAdd }) => {
-  const [showSubmit, setShowSubmit] = useState(true);
   const [count, setCount] = useState(0);
-  const [formInfo, setFormInfo] = useState({
-    title: '',
-    description: '',
-    imgUrl: '',
-    imdbUrl: '',
-    imdbId: '',
-  });
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [imgUrl, setImgUrl] = useState('');
+  const [imdbUrl, setImdbUrl] = useState('');
+  const [imdbId, setImdbId] = useState('');
 
-  useEffect(() => {
-    const isFormComplete = () => {
-      return (
-        formInfo.title.trim() !== '' &&
-        formInfo.imgUrl.trim() !== '' &&
-        formInfo.imdbUrl.trim() !== '' &&
-        formInfo.imdbId.trim() !== ''
-      );
-    };
-
-    setShowSubmit(!isFormComplete());
-  }, [formInfo]);
-
-  const handleChange = (name: string, value: string) => {
-    setFormInfo(prevInfo => ({ ...prevInfo, [name]: value }));
+  const reset = () => {
+    setTitle('');
+    setDescription('');
+    setImgUrl('');
+    setImdbUrl('');
+    setImdbId('');
   };
 
-  const handleSubmit = (event: FormEvent) => {
-    event.preventDefault();
-    const newMovie: Movie = {
-      title: formInfo.title,
-      description: formInfo.description,
-      imgUrl: formInfo.imgUrl,
-      imdbUrl: formInfo.imdbUrl,
-      imdbId: formInfo.imdbId,
-    };
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-    onAdd(newMovie);
+    setCount(prevCount => prevCount + 1);
 
-    setFormInfo({
-      title: '',
-      description: '',
-      imgUrl: '',
-      imdbUrl: '',
-      imdbId: '',
+    onAdd({
+      title,
+      description,
+      imgUrl,
+      imdbUrl,
+      imdbId,
     });
 
-    setCount(count + 1);
+    reset();
   };
 
   return (
-    <form onSubmit={handleSubmit} className="NewMovie" key={count}>
+    <form className="NewMovie" key={count} onSubmit={handleSubmit}>
       <h2 className="title">Add a movie</h2>
 
       <TextField
         name="title"
         label="Title"
-        onChange={value => {
-          handleChange('title', value);
-        }}
-        value={formInfo.title}
+        value={title}
+        onChange={newTitle => setTitle(newTitle)}
         required
       />
 
       <TextField
-        onChange={value => {
-          handleChange('description', value);
-        }}
         name="description"
         label="Description"
-        value={formInfo.description}
+        value={description}
+        onChange={newDescription => setDescription(newDescription)}
       />
 
       <TextField
-        required
-        onChange={value => {
-          handleChange('imgUrl', value);
-        }}
         name="imgUrl"
         label="Image URL"
-        value={formInfo.imgUrl}
+        value={imgUrl}
+        onChange={newImgUrl => setImgUrl(newImgUrl)}
+        required
       />
 
       <TextField
-        required
-        onChange={value => {
-          handleChange('imdbUrl', value);
-        }}
         name="imdbUrl"
         label="Imdb URL"
-        value={formInfo.imdbUrl}
+        value={imdbUrl}
+        onChange={newImdbUrl => setImdbUrl(newImdbUrl)}
+        required
       />
 
       <TextField
-        required
-        onChange={value => {
-          handleChange('imdbId', value);
-        }}
         name="imdbId"
         label="Imdb ID"
-        value={formInfo.imdbId}
+        value={imdbId}
+        onChange={newImdbId => setImdbId(newImdbId)}
+        required
       />
 
       <div className="field is-grouped">
         <div className="control">
           <button
-            disabled={showSubmit}
             type="submit"
             data-cy="submit-button"
             className="button is-link"
+            disabled={
+              !title.trim() ||
+              !imgUrl.trim() ||
+              !imdbUrl.trim() ||
+              !imdbId.trim()
+            }
           >
             Add
           </button>
